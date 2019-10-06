@@ -48,8 +48,8 @@ const writeFile = (fileName, data, ipReceived) => {
   });
 }
 
-const checkIfFileExists = (fileName) => {
-  return fs.existsSync(externalFilesDirectoryPath + '/' + fileName)
+const checkIfFileExists = (fileName, ipReceived) => {
+  return fs.existsSync(externalFilesDirectoryPath + '/' + ipReceived + '/' + fileName)
 }
 
 const createDirectory = (directory) => {

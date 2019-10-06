@@ -86,7 +86,7 @@ const sendFile = async (fileName, ipToSend) => {
 const readMessageAndAskForFiles = (list, ipToSend) => {
   const arrayOfFiles = list.split(',')
   arrayOfFiles.forEach(element => {
-    if(!checkIfFileExists(element)) {
+    if(!checkIfFileExists(element, ipToSend)) {
       askForFile(element, ipToSend)
     } 
   });
