@@ -1,5 +1,5 @@
-import { readListFiles, getMethod, getFileName, readFile, 
-  getFileSize, getListFiles, getDataFromFile, writeFile, checkIfFileExists } from './functions'
+import { readListFiles, readFile, getFileSize, writeFile, checkIfFileExists } from './fileManager'
+import { getMethod, getFileName, getListFiles, getDataFromFile } from './utils'
 import IPS from './external-ips'
 
 if(!process.env.IP)
@@ -13,8 +13,7 @@ const server = dgram.createSocket('udp4');
 const client = dgram.createSocket('udp4');
 
 process.stdin.on('data', data => {
-  sendMessage('PAE;abc.txt', IPS[0])
-  // askForListOfFiles(IPS[0])
+  askForListOfFiles(IPS[0])
 })
 
 server.on('listening', function () {
@@ -44,7 +43,7 @@ server.on('message', function (message, remote) {
     case 'EAE':
       const fileNameToSave = getFileName(message.toString(), 2)
       const dataFromFile = getDataFromFile(message.toString())
-      writeFile(fileNameToSave, dataFromFile)
+      writeFile(fileNameToSave, dataFromFile, remote.address)
       break;
     default:
       break;
@@ -54,7 +53,7 @@ server.on('message', function (message, remote) {
 const sendMessage = (message, ipToSend) => {
   // esperoResposta = true
   console.log("sendMessage", ipToSend)
-  client.send(message, 0, message.length, 41234, ipToSend, function(err, bytes) {
+  client.send(message, 0, message.length, 29000, ipToSend, function(err, bytes) {
     if (err) throw err;
     console.log('***** Mensagem enviada para:'+ ipToSend + '*****');  
   });
@@ -101,7 +100,3 @@ client.bind(ip)
 //     askForListOfFiles(element)
 //   });
 // }, 5000)
-
-// IPS.forEach(element => {
-//   askForListOfFiles(element)
-// });
