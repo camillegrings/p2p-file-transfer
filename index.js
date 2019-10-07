@@ -1,4 +1,5 @@
-import { readListFiles, readFile, getFileSize, writeFile, checkIfFileExists } from './fileManager'
+import { readListFiles, readFile, getFileSize, writeFile, 
+  checkIfFileExists, readListFilesFromIp, removeFile } from './fileManager'
 import { getMethod, getFileName, getListFiles, getDataFromFile } from './utils'
 import IPS from './external-ips'
 
@@ -83,8 +84,17 @@ const sendFile = async (fileName, ipToSend) => {
   sendMessage(message, ipToSend)
 }
 
-const readMessageAndAskForFiles = (list, ipToSend) => {
+const readMessageAndAskForFiles = async (list, ipToSend) => {
   const arrayOfFiles = list.split(',')
+  const filesSaved = await readListFilesFromIp(ipToSend)
+  var differentFiles = filesSaved.filter(function(e) {
+    return arrayOfFiles.indexOf(e) === -1;
+  });
+  differentFiles.forEach(element => {
+    if(checkIfFileExists(element, ipToSend)) {
+      removeFile(element, ipToSend)
+    } 
+  });
   arrayOfFiles.forEach(element => {
     if(!checkIfFileExists(element, ipToSend)) {
       askForFile(element, ipToSend)

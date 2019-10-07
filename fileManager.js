@@ -19,6 +19,19 @@ const readListFiles = () => {
     })
 }
 
+const readListFilesFromIp = (ipReceived) => {
+  return new Promise((resolve, reject) => {
+    fs.readdir(externalFilesDirectoryPath + '/' + ipReceived, function (err, files) {
+      if (err) {
+          console.log('Erro ao ler os arquivos: ' + err);
+          reject(err)
+      } 
+      resolve(files)
+    });
+  })
+}
+
+
 const readFile = async (fileName) => {
     return new Promise((resolve, reject) => {
       fs.readFile(myFilesDirectoryPath + '/' + fileName, function (err, file) {
@@ -53,15 +66,27 @@ const checkIfFileExists = (fileName, ipReceived) => {
 const createDirectory = (directory) => {
   if(!fs.existsSync(directory)) {
     return new Promise((resolve, reject) => {
-      fs.mkdir(directory, function (err, file) {
+      fs.mkdir(directory, function (err) {
         if(err && err.code !== 'EEXIST') 
           reject(err) 
-        
         resolve()
       })
     })
   }
 }
 
-export { readListFiles, readFile, getFileSize, writeFile, checkIfFileExists }
+const removeFile = (fileName, ipReceived) => {
+  const directory = externalFilesDirectoryPath + '/' + ipReceived + '/' + fileName
+  return new Promise((resolve, reject) => {
+    fs.unlink(directory, (err) => {
+      if (err) {
+        console.error(err)
+        return
+      }
+      resolve()
+    })
+  })
+}
+
+export { readListFiles, readFile, getFileSize, writeFile, checkIfFileExists, readListFilesFromIp, removeFile }
 
