@@ -5,7 +5,7 @@ const externalFilesDirectoryPath = path.join(__dirname, 'external');
 
 const readListFiles = () => {
     return new Promise((resolve, reject) => {
-      fs.readdirSync(myFilesDirectoryPath, function (err, files) {
+      fs.readdir(myFilesDirectoryPath, function (err, files) {
         if (err) {
             console.log('Erro ao ler os arquivos: ' + err);
             reject(err)
@@ -21,7 +21,7 @@ const readListFiles = () => {
 
 const readFile = async (fileName) => {
     return new Promise((resolve, reject) => {
-      fs.readFileSync(myFilesDirectoryPath + '/' + fileName, function (err, file) {
+      fs.readFile(myFilesDirectoryPath + '/' + fileName, function (err, file) {
         if (err) {
           reject(err);
           console.log('Erro ao ler o arquivo: ' + err);
@@ -38,6 +38,7 @@ const getFileSize = fileName => {
 
 const writeFile = (fileName, data, ipReceived) => {
   const directory = externalFilesDirectoryPath + '/' + ipReceived + '/' + fileName
+  console.log(directory)
   createDirectory(directory)
   fs.writeFile(directory, data, function (err) {
     if (err) throw err;
@@ -51,7 +52,9 @@ const checkIfFileExists = (fileName, ipReceived) => {
 
 const createDirectory = (directory) => {
   if(!fs.existsSync(directory)) {
-    fs.mkdirSync(directory)
+    return new Promise(() => {
+      fs.mkdirSync(directory)
+    })
   }
 }
 
