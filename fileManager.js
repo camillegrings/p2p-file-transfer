@@ -51,7 +51,6 @@ const getFileSize = fileName => {
 
 const writeFile = async (fileName, data, ipReceived) => {
   const directory = externalFilesDirectoryPath + '/' + ipReceived
-  console.log(directory)
   await createDirectory(directory)
   fs.writeFile(directory + '/' + fileName, data, function (err) {
     if (err) console.log('Erro ao escrever o arquivo: ' + err)
@@ -63,11 +62,15 @@ const checkIfFileExists = (fileName, ipReceived) => {
   return fs.existsSync(externalFilesDirectoryPath + '/' + ipReceived + '/' + fileName)
 }
 
+const checkIfDirectoryExists = (ipReceived) => {
+  return fs.existsSync(externalFilesDirectoryPath + '/' + ipReceived)
+}
+
 const createDirectory = (directory) => {
   if(!fs.existsSync(directory)) {
     return new Promise((resolve, reject) => {
       fs.mkdir(directory, function (err) {
-        if(err && err.code !== 'EEXIST') 
+        if(err && err.code !== 'EXIST') 
           reject(err) 
         resolve()
       })
@@ -80,13 +83,14 @@ const removeFile = (fileName, ipReceived) => {
   return new Promise((resolve, reject) => {
     fs.unlink(directory, (err) => {
       if (err) {
-        console.error(err)
-        return
+        console.error('Ocorreu um erro ao deletar o arquivo:', err)
+        reject(err)
       }
       resolve()
     })
   })
 }
 
-export { readListFiles, readFile, getFileSize, writeFile, checkIfFileExists, readListFilesFromIp, removeFile }
+export { readListFiles, readFile, getFileSize, writeFile, checkIfFileExists, readListFilesFromIp, 
+  removeFile, checkIfDirectoryExists }
 

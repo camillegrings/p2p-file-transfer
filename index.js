@@ -1,112 +1,57 @@
-import { readListFiles, readFile, getFileSize, writeFile, 
-  checkIfFileExists, readListFilesFromIp, removeFile } from './fileManager'
-import { getMethod, getFileName, getListFiles, getDataFromFile } from './utils'
+import dgram from 'udp4'
+import { chooseMethod, askForListOfFiles } from './messageManager'
+import { getMethod } from './utils'
 import IPS from './external-ips'
 
+// Atribuir o ip da máquina local, que está setada no environment, para a variável ip
 if(!process.env.IP)
-  throw Error("Variável de ambiente PORT não informada");
-
+  throw Error("Variável de ambiente IP não informada");
 const ip = process.env.IP;
 
-const dgram = require('dgram');
+// Criação do server e do cliente
+const server = dgram.createSocket('udp4')
+const client = dgram.createSocket('udp4')
 
-const server = dgram.createSocket('udp4');
-const client = dgram.createSocket('udp4');
+// process.stdin.on('data', data => {
+//   askForListOfFiles(IPS[0])
+// })
 
-process.stdin.on('data', data => {
-  askForListOfFiles(IPS[0])
-})
+let time = 0
 
+// Inicializar server
 server.on('listening', function () {
-  var address = server.address();
-  console.log('Servidor escutando em ' + address.address + ":" + address.port);
+  const address = server.address()
+  console.log('Servidor escutando em ' + address.address + ":" + address.port)
 });
 
+// Criação do evento message do server - Qualquer mensagem que o server receber irá cair aqui
 server.on('message', function (message, remote) {
-  console.log(remote)
-  console.log('---- Mensagem recebida de: ' + remote.address + ' - ' + message + '----');
+  time = new Date().getMilliseconds()
   const method = getMethod(message.toString())
-  console.log(method)
-  switch (method) {
-    case 'PTA':
-      sendListOfFiles(remote.address)
-      
-      break;
-    case 'PAE':
-      const fileName = getFileName(message.toString())
-      console.log(fileName)
-      sendFile(fileName, remote.address)
-      break;
-    case 'ETA':
-      const list = getListFiles(message.toString())
-      readMessageAndAskForFiles(list, remote.address)
-      break;
-    case 'EAE':
-      const fileNameToSave = getFileName(message.toString(), 2)
-      const dataFromFile = getDataFromFile(message.toString())
-      writeFile(fileNameToSave, dataFromFile, remote.address)
-      break;
-    default:
-      break;
-  }
+  console.log('Mensagem recebida: ' + remote.address + ' - ' + method)
+  chooseMethod(method, remote, message)
 })
 
+// Criação do método de envio de mensagem pelo clients
 const sendMessage = (message, ipToSend) => {
-  // esperoResposta = true
-  console.log("sendMessage", ipToSend)
-  client.send(message, 0, message.length, 29000, ipToSend, function(err, bytes) {
+  const endTime = time - new Date().getMilliseconds()
+  time = 0
+  client.send(message, 0, message.length, 29000, ipToSend, function(err) {
     if (err) throw err;
-    console.log('***** Mensagem enviada para:'+ ipToSend + '*****');  
+    console.log('Mensagem enviada para:' + ipToSend + 'em ' + endTime + 'milisegundos')
   });
 }
 
-const askForListOfFiles = (ipToSend) => {
-  const message = 'PTA;'
-  sendMessage(message, ipToSend)
-}
-
-const sendListOfFiles = async (ipToSend) => {
-  const filesNames = await readListFiles()
-  const message = 'ETA;' + filesNames + ';'
-  sendMessage(message, ipToSend)
-}
-
-const askForFile = (fileName, ipToSend) => {
-  const message = 'PAE;' + fileName + ';'
-  sendMessage(message, ipToSend)
-}
-
-const sendFile = async (fileName, ipToSend) => {
-  const file = await readFile(fileName)
-  console.log("sendFile", ipToSend)
-  const fileSize = getFileSize(fileName)
-  const message = 'EAE;' + fileSize + ';' + fileName + ';' + file + ';'
-  sendMessage(message, ipToSend)
-}
-
-const readMessageAndAskForFiles = async (list, ipToSend) => {
-  const arrayOfFiles = list.split(',')
-  const filesSaved = await readListFilesFromIp(ipToSend)
-  var differentFiles = filesSaved.filter(function(e) {
-    return arrayOfFiles.indexOf(e) === -1;
-  });
-  differentFiles.forEach(element => {
-    if(checkIfFileExists(element, ipToSend)) {
-      removeFile(element, ipToSend)
-    } 
-  });
-  arrayOfFiles.forEach(element => {
-    if(!checkIfFileExists(element, ipToSend)) {
-      askForFile(element, ipToSend)
-    } 
-  });
-}
-
+// Bind do client e do server com o ip da variável de ambiente
 server.bind(29000, ip)
 client.bind(ip)
 
-// setInterval(function(){ 
-//   IPS.forEach(element => {
-//     askForListOfFiles(element)
-//   });
-// }, 5000)
+
+// Enviar PTA de 5 em 5 segundos para os Ips salvos
+const ipToAsk = 0
+setInterval(function(){ 
+  askForListOfFiles(IPS[ipToAsk])
+  ipToAsk++
+}, 5000)
+
+export { sendMessage }

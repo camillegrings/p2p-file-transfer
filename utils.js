@@ -1,5 +1,8 @@
 const getMethod = (message) => {
-    return message.split(';')[0]
+   if(message.includes(';')) {
+       return message.split(';')[0]
+   }
+   return message
 }
 
 const getFileName = (message, number = 1) => {
