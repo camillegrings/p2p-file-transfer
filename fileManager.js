@@ -37,10 +37,10 @@ const getFileSize = fileName => {
 }
 
 const writeFile = async (fileName, data, ipReceived) => {
-  const directory = externalFilesDirectoryPath + '/' + ipReceived + '/' + fileName
+  const directory = externalFilesDirectoryPath + '/' + ipReceived
   console.log(directory)
   await createDirectory(directory)
-  fs.writeFile(directory, data, function (err) {
+  fs.writeFile(directory + '/' + fileName, data, function (err) {
     if (err) throw err;
     console.log('Arquivo salvo!');
   });
