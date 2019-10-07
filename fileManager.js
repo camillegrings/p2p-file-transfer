@@ -36,10 +36,10 @@ const getFileSize = fileName => {
     return  stats.size
 }
 
-const writeFile = (fileName, data, ipReceived) => {
+const writeFile = async (fileName, data, ipReceived) => {
   const directory = externalFilesDirectoryPath + '/' + ipReceived + '/' + fileName
   console.log(directory)
-  createDirectory(directory)
+  await createDirectory(directory)
   fs.writeFile(directory, data, function (err) {
     if (err) throw err;
     console.log('Arquivo salvo!');
@@ -52,8 +52,13 @@ const checkIfFileExists = (fileName, ipReceived) => {
 
 const createDirectory = (directory) => {
   if(!fs.existsSync(directory)) {
-    return new Promise(() => {
-      fs.mkdirSync(directory)
+    return new Promise((resolve, reject) => {
+      fs.mkdir(directory, function (err, file) {
+        if(err && err.code !== 'EEXIST') 
+          reject(err) 
+        
+        resolve()
+      })
     })
   }
 }
