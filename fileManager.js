@@ -41,7 +41,7 @@ const writeFile = async (fileName, data, ipReceived) => {
   console.log(directory)
   await createDirectory(directory)
   fs.writeFile(directory + '/' + fileName, data, function (err) {
-    if (err) throw err;
+    if (err) console.log('Erro ao escrever o arquivo: ' + err)
     console.log('Arquivo salvo!');
   });
 }
