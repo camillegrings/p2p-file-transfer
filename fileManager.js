@@ -98,7 +98,7 @@ const removeFile = (fileName, ipReceived) => {
   //     resolve()
   //   })
   // })
-  return fs.unlinkSync(directory)
+  return fs.unlink(directory)
 }
 
 export { readListFiles, readFile, getFileSize, writeFile, checkIfFileExists, readListFilesFromIp, 

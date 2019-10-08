@@ -62,10 +62,10 @@ const filterFilesToDelete = (filesSaved, arrayOfFiles) => {
   })
 }
 
-const deleteFilesFromFolder = async (differentFiles) => {
+const deleteFilesFromFolder = (differentFiles) => {
   differentFiles.forEach(element => {
     if(checkIfFileExists(element, ipToSend)) {
-      await removeFile(element, ipToSend)
+        removeFile(element, ipToSend)
     } 
   })
 }
