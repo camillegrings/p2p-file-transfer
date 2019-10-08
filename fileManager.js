@@ -51,16 +51,15 @@ const createDirectory = (directory) => {
 
 const removeFile = (fileName, ipReceived) => {
   const directory = externalFilesDirectoryPath + '/' + ipReceived + '/' + fileName
-  // return new Promise((resolve, reject) => {
-  //   fs.unlink(directory, (err) => {
-  //     if (err) {
-  //       console.error('Ocorreu um erro ao deletar o arquivo:', err)
-  //       reject(err)
-  //     }
-  //     resolve()
-  //   })
-  // })
-  return fs.unlinkSync(directory)
+  return new Promise((resolve, reject) => {
+    fs.unlink(directory, (err) => {
+      if (err) {
+        console.error('Ocorreu um erro ao deletar o arquivo:', err)
+        reject(err)
+      }
+      resolve()
+    })
+  })
 }
 
 export { readListFiles, readFile, getFileSize, writeFile, checkIfFileExists, readListFilesFromIp, 

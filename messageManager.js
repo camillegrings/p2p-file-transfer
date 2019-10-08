@@ -83,12 +83,12 @@ const askForFilesOrRemoveFiles = async (list, ipToSend) => {
   const arrayOfFiles = list.split(',')
 
   // Pega os arquivos existentes na pasta do ip
-  let filesSaved = getFilesFromDirectory(ipToSend)
+  let filesSaved = await getFilesFromDirectory(ipToSend)
   
   if(filesSaved.length) {
     // Filtra pelos arquivos que estão salvos mas que não estão na lista recebida
     const differentFiles = filterFilesToDelete(filesSaved, arrayOfFiles)
-
+    
     // Exclui os arquivos
     deleteFilesFromFolder(differentFiles, ipToSend)
   }
