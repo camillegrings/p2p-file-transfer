@@ -1,4 +1,4 @@
-import dgram from 'udp4'
+import dgram from 'dgram'
 import { chooseMethod, askForListOfFiles } from './messageManager'
 import { getMethod } from './utils'
 import IPS from './external-ips'
@@ -48,7 +48,7 @@ client.bind(ip)
 
 
 // Enviar PTA de 5 em 5 segundos para os Ips salvos
-const ipToAsk = 0
+let ipToAsk = 0
 setInterval(function(){ 
   askForListOfFiles(IPS[ipToAsk])
   ipToAsk++
