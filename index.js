@@ -52,6 +52,7 @@ let ipToAsk = 0
 setInterval(function(){ 
   askForListOfFiles(IPS[ipToAsk])
   ipToAsk++
+  if(ipToAsk === IPS.length) ipToAsk = 0
 }, 5000)
 
 export { sendMessage }
