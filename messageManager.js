@@ -49,7 +49,7 @@ const sendFile = async (fileName, ipToSend) => {
   sendMessage(message, ipToSend)
 }
 
-const getFilesFromDirectory = (ipToSend) => {
+const getFilesFromDirectory = async (ipToSend) => {
   if(checkIfDirectoryExists(ipToSend)) {
     return await readListFilesFromIp(ipToSend)
   }
