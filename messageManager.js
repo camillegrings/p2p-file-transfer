@@ -62,7 +62,7 @@ const filterFilesToDelete = (filesSaved, arrayOfFiles) => {
   })
 }
 
-const deleteFilesFromFolder = (differentFiles) => {
+const deleteFilesFromFolder = (differentFiles, ipToSend) => {
   differentFiles.forEach(element => {
     if(checkIfFileExists(element, ipToSend)) {
         removeFile(element, ipToSend)
@@ -70,7 +70,7 @@ const deleteFilesFromFolder = (differentFiles) => {
   })
 }
 
-const checkAndAskForFile = (arrayOfFiles) => {
+const checkAndAskForFile = (arrayOfFiles, ipToSend) => {
   arrayOfFiles.forEach(element => {
     if(!checkIfFileExists(element, ipToSend)) {
       askForFile(element, ipToSend)
@@ -90,11 +90,11 @@ const askForFilesOrRemoveFiles = async (list, ipToSend) => {
     const differentFiles = filterFilesToDelete(filesSaved, arrayOfFiles)
 
     // Exclui os arquivos
-    deleteFilesFromFolder(differentFiles)
+    deleteFilesFromFolder(differentFiles, ipToSend)
   }
 
   // Os arquivos que eu não tenho na pasta local, gera um PAE para cada um
-  checkAndAskForFile(checkAndAskForFile)
+  checkAndAskForFile(arrayOfFiles, ipToSend)
 }
 
 export { chooseMethod, askForListOfFiles }
