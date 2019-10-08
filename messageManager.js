@@ -44,9 +44,38 @@ const askForFile = (fileName, ipToSend) => {
 
 const sendFile = async (fileName, ipToSend) => {
   const file = await readFile(fileName)
-  const fileSize = getFileSize(fileName)
+  const fileSize = await getFileSize(fileName)
   const message = 'EAE;' + fileSize + ';' + fileName + ';' + file + ';'
   sendMessage(message, ipToSend)
+}
+
+const getFilesFromDirectory = (ipToSend) => {
+  if(checkIfDirectoryExists(ipToSend)) {
+    return await readListFilesFromIp(ipToSend)
+  }
+  return []
+}
+
+const filterFilesToDelete = (filesSaved, arrayOfFiles) => {
+  return filesSaved.filter(function(e) {
+    return arrayOfFiles.indexOf(e) === -1;
+  })
+}
+
+const deleteFilesFromFolder = async (differentFiles) => {
+  differentFiles.forEach(element => {
+    if(checkIfFileExists(element, ipToSend)) {
+      await removeFile(element, ipToSend)
+    } 
+  })
+}
+
+const checkAndAskForFile = (arrayOfFiles) => {
+  arrayOfFiles.forEach(element => {
+    if(!checkIfFileExists(element, ipToSend)) {
+      askForFile(element, ipToSend)
+    } 
+  })
 }
 
 const askForFilesOrRemoveFiles = async (list, ipToSend) => {
@@ -54,31 +83,18 @@ const askForFilesOrRemoveFiles = async (list, ipToSend) => {
   const arrayOfFiles = list.split(',')
 
   // Pega os arquivos existentes na pasta do ip
-  let filesSaved = []
-  if(checkIfDirectoryExists(ipToSend)) {
-    filesSaved = await readListFilesFromIp(ipToSend)
-  }
-
+  let filesSaved = getFilesFromDirectory(ipToSend)
+  
   if(filesSaved.length) {
     // Filtra pelos arquivos que estão salvos mas que não estão na lista recebida
-    const differentFiles = filesSaved.filter(function(e) {
-      return arrayOfFiles.indexOf(e) === -1;
-    })
+    const differentFiles = filterFilesToDelete(filesSaved, arrayOfFiles)
 
     // Exclui os arquivos
-    differentFiles.forEach(element => {
-      if(checkIfFileExists(element, ipToSend)) {
-        removeFile(element, ipToSend)
-      } 
-    })
+    deleteFilesFromFolder(differentFiles)
   }
 
   // Os arquivos que eu não tenho na pasta local, gera um PAE para cada um
-  arrayOfFiles.forEach(element => {
-    if(!checkIfFileExists(element, ipToSend)) {
-      askForFile(element, ipToSend)
-    } 
-  });
+  checkAndAskForFile(checkAndAskForFile)
 }
 
 export { chooseMethod, askForListOfFiles }
