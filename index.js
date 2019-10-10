@@ -12,10 +12,6 @@ const ip = process.env.IP;
 const server = dgram.createSocket('udp4')
 const client = dgram.createSocket('udp4')
 
-// process.stdin.on('data', data => {
-//   askForListOfFiles(IPS[0])
-// })
-
 let time = 0
 
 // Inicializar server
